@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization AI Agent</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #4a6cf7;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        /* Main content layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        /* Upload section */
+        .upload-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .upload-box {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-box:hover {
+            border-color: #4a6cf7;
+            background-color: #f8f9ff;
+        }
+        
+        .upload-box i {
+            font-size: 40px;
+            color: #4a6cf7;
+            margin-bottom: 10px;
+        }
+        
+        .upload-box p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .upload-box .file-types {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            background-color: #3a5ce5;
+        }
+        
+        /* Data preview section */
+        .data-preview {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .data-preview h3 {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .data-info {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .data-info-item {
+            background-color: #f5f7fa;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .data-info-item span {
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        table th {
+            background-color: #f5f7fa;
+            font-weight: 600;
+        }
+        
+        /* Chat section */
+        .chat-section {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+        }
+        
+        .chat-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h2 {
+            font-size: 18px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            max-width: 80%;
+        }
+        
+        .message-content {
+            padding: 12px 15px;
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .user-message {
+            margin-left: auto;
+        }
+        
+        .user-message .message-content {
+            background-color: #4a6cf7;
+            color: white;
+            border-top-right-radius: 0;
+        }
+        
+        .assistant-message {
+            margin-right: auto;
+        }
+        
+        .assistant-message .message-content {
+            background-color: #f0f2f6;
+            border-top-left-radius: 0;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .chart-container {
+            margin-top: 10px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-container img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+        
+        .chat-input-container {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .chat-input:focus {
+            border-color: #4a6cf7;
+        }
+        
+        .send-btn {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .send-btn:hover {
+            background-color: #3a5ce5;
+        }
+        
+        /* Suggestions section */
+        .suggestions {
+            margin-top: 15px;
+        }
+        
+        .suggestions h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .suggestion-chip {
+            background-color: #f0f2f6;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .suggestion-chip:hover {
+            background-color: #e6e9f0;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(74, 108, 247, 0.2);
+            border-radius: 50%;
+            border-top-color: #4a6cf7;
+            animation: spin 1s ease-in-out infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Visualization types section */
+        .viz-types {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+        }
+        
+        .viz-types h3 {
+            margin-bottom: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .viz-types-content {
+            display: none;
+        }
+        
+        .viz-types-content.active {
+            display: block;
+        }
+        
+        .viz-type {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .viz-type:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .viz-type h4 {
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        
+        .viz-type p {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div>
+                <h1>Data Visualization AI Agent</h1>
+                <p class="subtitle">Upload your data and chat to create visualizations</p>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="alert" class="alert"></div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="upload-section">
+                    <h2>Upload Data</h2>
+                    <div id="upload-box" class="upload-box">
+                        <i>📁</i>
+                        <p>Drag & drop your file here</p>
+                        <p>or</p>
+                        <button id="browse-btn" class="upload-btn">Browse Files</button>
+                        <p class="file-types">Supported: CSV, Excel (.xlsx, .xls)</p>
+                    </div>
+                    <input type="file" id="file-input" class="file-input" accept=".csv,.xlsx,.xls">
+                </div>
+                
+                <!-- Data Preview and Visualization Types components removed as requested -->
+            </div>
+            
+            <div class="chat-section">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h2>Chat with your data</h2>
+                    </div>
+                    <div id="chat-messages" class="chat-messages">
+                        <div class="message assistant-message">
+                            <div class="message-content">
+                                Welcome to the Data Visualization AI Agent! Upload a CSV or Excel file to get started.
+                            </div>
+                            <div class="message-time">Just now</div>
+                        </div>
+                    </div>
+                    <div id="spinner" class="spinner"></div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chat-input" class="chat-input" placeholder="Ask for a visualization..." disabled>
+                        <button id="send-btn" class="send-btn" disabled>➤</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let sessionId = null;
+        let suggestions = [];
+        
+        // DOM elements
+        const uploadBox = document.getElementById('upload-box');
+        const browseBtn = document.getElementById('browse-btn');
+        const fileInput = document.getElementById('file-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const spinner = document.getElementById('spinner');
+        const alert = document.getElementById('alert');
+        
+        // Event listeners
+        uploadBox.addEventListener('click', () => fileInput.click());
+        browseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+        
+        uploadBox.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadBox.style.borderColor = '#4a6cf7';
+            uploadBox.style.backgroundColor = '#f8f9ff';
+        });
+        
+        uploadBox.addEventListener('dragleave', () => {
+            uploadBox.style.borderColor = '#ccc';
+            uploadBox.style.backgroundColor = 'white';
+        });
+        
+        uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadBox.style.borderColor = '#ccc';
+            uploadBox.style.backgroundColor = 'white';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileUpload();
+            }
+        });
+        
+        fileInput.addEventListener('change', handleFileUpload);
+        
+        sendBtn.addEventListener('click', sendMessage);
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Functions
+        function handleFileUpload() {
+            if (!fileInput.files.length) return;
+            
+            const file = fileInput.files[0];
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            
+            if (!['csv', 'xlsx', 'xls'].includes(fileExt)) {
+                showAlert('Please upload a CSV or Excel file.', 'error');
+                return;
+            }
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Show loading spinner
+            spinner.style.display = 'block';
+            
+            // Upload file
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('File upload failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hide spinner
+                spinner.style.display = 'none';
+                
+                // Store session ID
+                sessionId = data.session_id;
+                
+                // Show success message
+                showAlert(data.message, 'success');
+                
+                // Enable chat input
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                
+                // Add initial message with suggestions
+                addAssistantMessage(createInitialMessage(data));
+                
+                // Store suggestions
+                suggestions = data.suggestions;
+            })
+            .catch(error => {
+                spinner.style.display = 'none';
+                showAlert('Error: ' + error.message, 'error');
+            });
+        }
+        
+        // Data preview function removed as requested
+        
+        function createInitialMessage(data) {
+            let message = `I've analyzed your data. Here's what I found:<br><br>`;
+            
+            message += `<strong>Data Overview:</strong><br>`;
+            message += `- Rows: ${data.data_info.rows}<br>`;
+            message += `- Columns: ${data.data_info.columns}<br><br>`;
+            
+            message += `<strong>Column Types:</strong><br>`;
+            message += `- Numeric columns: ${data.data_info.numeric_columns.join(', ') || 'None'}<br>`;
+            message += `- Categorical columns: ${data.data_info.categorical_columns.join(', ') || 'None'}<br>`;
+            message += `- Date columns: ${data.data_info.date_columns.join(', ') || 'None'}<br><br>`;
+            
+            message += `<strong>Suggested Visualizations:</strong><br>`;
+            data.suggestions.forEach(suggestion => {
+                message += `- ${suggestion}<br>`;
+            });
+            
+            message += `<br>You can ask me to create any of these visualizations or request a different one based on your needs.`;
+            
+            return message;
+        }
+        
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            
+            if (!message || !sessionId) return;
+            
+            // Add user message
+            addUserMessage(message);
+            
+            // Clear input
+            chatInput.value = '';
+            
+            // Show spinner
+            spinner.style.display = 'block';
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('prompt', message);
+            
+            // Send message to API
+            fetch(`/chat/${sessionId}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to get response');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hide spinner
+                spinner.style.display = 'none';
+                
+                // Add assistant message
+                addAssistantMessage(data.response, data.chart_url);
+            })
+            .catch(error => {
+                spinner.style.display = 'none';
+                showAlert('Error: ' + error.message, 'error');
+            });
+        }
+        
+        function addUserMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = message;
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = getCurrentTime();
+            
+            messageDiv.appendChild(contentDiv);
+            messageDiv.appendChild(timeDiv);
+            
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function addAssistantMessage(message, chartUrl = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant-message';
+            
+            // Clean up the message to remove any image path references
+            let cleanedMessage = message;
+            // Remove markdown image links: ![alt text](image_path)
+            cleanedMessage = cleanedMessage.replace(/!\[.*?\]\(.*?\)/g, '');
+            // Remove HTML img tags: <img src="image_path" ... />
+            cleanedMessage = cleanedMessage.replace(/<img.*?src=["'](.*?)["'].*?\/?>/g, '');
+            // Remove direct references to file paths
+            cleanedMessage = cleanedMessage.replace(/(\/.*?\.png|\/.*?\.jpg|\/.*?\.jpeg|\/.*?\.gif)/g, '');
+            // Remove any remaining references to the exports/charts directory
+            cleanedMessage = cleanedMessage.replace(/exports\/charts\/.*?\.png/g, '');
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = cleanedMessage;
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = getCurrentTime();
+            
+            messageDiv.appendChild(contentDiv);
+            
+            // Add chart if available
+            if (chartUrl) {
+                const chartDiv = document.createElement('div');
+                chartDiv.className = 'chart-container';
+                
+                const chartImg = document.createElement('img');
+                chartImg.src = chartUrl;
+                chartImg.alt = 'Visualization';
+                
+                chartDiv.appendChild(chartImg);
+                messageDiv.appendChild(chartDiv);
+            }
+            
+            messageDiv.appendChild(timeDiv);
+            
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function showAlert(message, type) {
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+pandasai
+langchain_anthropic
+seaborn
+python-dotenv
+pandas
+openpyxl
+fastapi
+uvicorn
+python-multipart
+aiofiles
